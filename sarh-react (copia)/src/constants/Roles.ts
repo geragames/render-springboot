@@ -1,0 +1,7 @@
+export  const Roles = {
+    ROLE_USER: 'ROLE_USER',
+    ROLE_ADMIN: 'ROLE_ADMIN',
+    ROLE_INVITED: 'ROLE_INVITED',
+    ROLE_DEVELOPER: 'ROLE_DEVELOPER'
+}
+    

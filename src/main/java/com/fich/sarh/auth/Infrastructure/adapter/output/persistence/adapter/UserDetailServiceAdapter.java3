@@ -1,0 +1,103 @@
+package com.fich.sarh.auth.Infrastructure.adapter.output.persistence.adapter;
+
+import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.jwt.JwtUtils;
+import com.fich.sarh.auth.Infrastructure.adapter.input.rest.model.response.AuthResponse;
+import com.fich.sarh.auth.Infrastructure.adapter.input.rest.model.request.LoginRequest;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.entities.UserEntity;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.repository.UserRepository;
+import com.fich.sarh.common.PersistenceAdapter;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@PersistenceAdapter
+public class UserDetailServiceAdapter {}
+/*
+
+    private final UserRepository userRepository;
+
+    private final JwtUtils jwtUtils;
+
+
+
+    public UserDetailServiceAdapter(UserRepository userRepository, JwtUtils jwtUtils) {
+        this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
+
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no existe"));
+
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+
+        userEntity.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_".concat(role.getName().name()))));
+
+
+        userEntity.getRoles().stream().flatMap(role -> role.getPermissionSet().stream())
+                .forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
+
+        return new User(userEntity.getUsername(),
+                userEntity.getPassword(),
+                userEntity.isEnabled(),
+                userEntity.isAccountNonExpired(),
+                userEntity.isCredentialNonExpired(),
+                userEntity.isAccountNonLocked(),
+                authorities);
+    }
+
+  */
+/* public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+   }
+
+    public Authentication authenticate(String username, String password){
+
+
+        UserDetails userDetails1 =  this.loadUserByUsername(username);
+        if(userDetails == null){
+            throw new BadCredentialsException("Invalid username or password");
+        }
+        if(passwordEncoder().matches(password, userDetails1.getPassword())){
+            throw new BadCredentialsException("Invalid password");
+        }
+
+
+        return new UsernamePasswordAuthenticationToken(username, userDetails1.getPassword(), userDetails1.getAuthorities());
+    }
+
+
+    public AuthResponse loginUser(LoginRequest authLoginRequest) {
+
+        String username = authLoginRequest.username();
+
+        String password = authLoginRequest.password();
+
+        Authentication authentication = this.authenticate(username, password);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = jwtUtils.createToken(authentication);
+
+        AuthResponse authResponse = new AuthResponse(username, "User loged successfuly", accessToken, true);
+
+        return authResponse;
+    }
+}*//*
+

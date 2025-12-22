@@ -1,0 +1,140 @@
+package com.fich.sarh.auth.Infrastructure.adapter.output.persistence.adapter;
+
+
+import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.jwt.JwtUtils;
+import com.fich.sarh.auth.Infrastructure.adapter.input.rest.model.request.LoginRequest;
+import com.fich.sarh.auth.Infrastructure.adapter.input.rest.model.request.UserRequest;
+import com.fich.sarh.auth.Infrastructure.adapter.input.rest.model.response.AuthResponse;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.entities.RoleEntity;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.entities.UserEntity;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.repository.RoleRepository;
+import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+
+public class UserDetailServiceImpl implements UserDetailsService {
+
+
+    Logger logger = LoggerFactory.getLogger(UserDetailServiceImpl.class);
+
+    private JwtUtils jwtUtils;
+    private final UserRepository userRepository;
+
+    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+
+    public UserDetailServiceImpl(JwtUtils jwtUtils, UserRepository userRepository, RoleRepository roleRepository) {
+        this.jwtUtils = jwtUtils;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+
+        logger.error("USERNAME " + username);
+
+        UserEntity userEntity = userRepository.findUserEntityByUsername(username).get(); //.orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no existe."));
+
+        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+
+        userEntity.getRoles().forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
+
+        userEntity.getRoles().stream().flatMap(role -> role.getPermissionSet().stream()).forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
+
+
+        return new User(userEntity.getUsername(), userEntity.getPassword(), userEntity.isEnabled(), userEntity.isAccountNonExpired(), userEntity.isCredentialNonExpired(),
+                userEntity.isAccountNonLocked(), authorityList);
+    }
+
+    public AuthResponse createUser(UserRequest request) {
+
+        String username = request.getUsername();
+        String password = request.getPassword();
+        Set<String> rolesRequest = (Set<String>) request.getRoles().stream().map(rol -> rol.getName().name()).collect(Collectors.toSet());
+
+        Set<RoleEntity> roleEntityList = roleRepository.findRoleEntitiesByRoleEnumIn(rolesRequest).stream().collect(Collectors.toSet());
+
+        if (roleEntityList.isEmpty()) {
+            throw new IllegalArgumentException("The roles specified does not exist.");
+        }
+
+        UserEntity userEntity = UserEntity.builder().username(username).password(passwordEncoder().encode(password)).roles(roleEntityList).isEnabled(true)
+                .accountNonLocked(true)
+                .accountNonExpired(true)
+                .credentialNonExpired(true).build();
+
+        UserEntity userSaved = userRepository.save(userEntity);
+
+        ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        userSaved.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRoleEnum().name()))));
+
+        userSaved.getRoles().stream().flatMap(role -> role.getPermissionSet().stream()).forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
+
+        SecurityContext securityContextHolder = SecurityContextHolder.getContext();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userSaved, null, authorities);
+
+        String accessToken = jwtUtils.createToken(authentication);
+
+        AuthResponse authResponse = new AuthResponse(username, "User created successfully", accessToken, true);
+        return authResponse;
+    }
+
+    public AuthResponse loginUser(LoginRequest authLoginRequest) {
+
+        logger.info("LOGIN " + authLoginRequest);
+
+
+        String username = authLoginRequest.username();
+        String password = authLoginRequest.password();
+
+        Authentication authentication = this.authenticate(username, password);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = jwtUtils.createToken(authentication);
+        AuthResponse authResponse = new AuthResponse(username, "User loged succesfully", accessToken, true);
+
+
+        return authResponse;
+    }
+
+    public Authentication authenticate(String username, String password) {
+        UserDetails userDetails = this.loadUserByUsername(username);
+
+        if (userDetails == null) {
+            throw new BadCredentialsException(String.format("Invalid username or password"));
+        }
+
+        if (!passwordEncoder().matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException("Incorrect Password");
+        }
+
+        return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}

@@ -1,0 +1,9 @@
+.layout {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: relative;
+    overflow: hidden;
+}
