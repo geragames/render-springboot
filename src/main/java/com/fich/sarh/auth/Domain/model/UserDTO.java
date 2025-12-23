@@ -36,7 +36,7 @@ public class UserDTO {
 
     private String profilePicturePath;
 
-    private boolean isEnabled = true;
+    private boolean isEnabled;
 
     private boolean accountNonExpired;
 
