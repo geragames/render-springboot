@@ -114,6 +114,10 @@ public class UserController {
                 .password(passwordEncoder.encode(createUser.getPassword()))
                 .email(createUser.getEmail())
                 .profilePicturePath(filename)
+                .isEnabled(true)
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialNonExpired(true)
                 .roles(roles_entity).build();
 
 
