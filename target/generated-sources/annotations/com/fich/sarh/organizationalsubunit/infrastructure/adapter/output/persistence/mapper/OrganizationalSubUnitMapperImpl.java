@@ -10,7 +10,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-23T12:47:13-0300",
+    date = "2025-12-23T18:53:34-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.9 (Microsoft)"
 )
 public class OrganizationalSubUnitMapperImpl implements OrganizationalSubUnitMapper {
