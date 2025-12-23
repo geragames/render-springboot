@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-23T10:33:59-0300",
+    date = "2025-12-23T11:03:19-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.9 (Microsoft)"
 )
 @Component
@@ -33,6 +33,9 @@ public class UserRestMapperImpl implements UserRestMapper {
         userDTO.username( request.getUsername() );
         userDTO.password( request.getPassword() );
         userDTO.profilePicturePath( request.getProfilePicturePath() );
+        userDTO.accountNonExpired( request.isAccountNonExpired() );
+        userDTO.accountNonLocked( request.isAccountNonLocked() );
+        userDTO.credentialNonExpired( request.isCredentialNonExpired() );
         userDTO.roles( roleRequestSetToRoleDTOSet( request.getRoles() ) );
 
         return userDTO.build();
@@ -66,6 +69,9 @@ public class UserRestMapperImpl implements UserRestMapper {
         userRequest.username( user.getUsername() );
         userRequest.profilePicturePath( user.getProfilePicturePath() );
         userRequest.password( user.getPassword() );
+        userRequest.accountNonExpired( user.isAccountNonExpired() );
+        userRequest.accountNonLocked( user.isAccountNonLocked() );
+        userRequest.credentialNonExpired( user.isCredentialNonExpired() );
         userRequest.roles( roleDTOSetToRoleRequestSet( user.getRoles() ) );
 
         return userRequest.build();

@@ -1,6 +1,7 @@
 package com.fich.sarh.auth.Domain.model;
 
 import com.fich.sarh.auth.Infrastructure.adapter.validation.UniqueUsername;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -30,8 +31,19 @@ public class UserDTO {
             message = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número"
     )
     private String password;
+
     private boolean mustChangePassword;
+
     private String profilePicturePath;
+
+    private boolean isEnabled = true;
+
+    private boolean accountNonExpired;
+
+    private boolean accountNonLocked;
+
+    private boolean credentialNonExpired;
+
     private Set<RoleDTO> roles;
 
 
