@@ -118,7 +118,7 @@ public class UserDetailServicePort implements UserDetailsSpiPort, UserResetPassw
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .roles(roleEntityList)
-                .isEnabled(true)
+                .enabled(true)
                 .accountNonLocked(true)
                 .accountNonExpired(true)
                 .credentialNonExpired(true).build();

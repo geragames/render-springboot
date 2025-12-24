@@ -27,7 +27,7 @@ public class UserRequest {
     @NotBlank
     private String password;
 
-    boolean isEnabled;
+    boolean enabled;
 
     boolean accountNonExpired;
 

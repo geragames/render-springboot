@@ -36,8 +36,7 @@ public class UserEntity {
     String password;
 
     @Column(name = "is_enabled")
-
-    boolean isEnabled;
+    boolean enabled;
 
     boolean mustChangePassword = false;
 

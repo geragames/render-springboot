@@ -12,7 +12,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-23T18:53:35-0300",
+    date = "2025-12-24T08:04:42-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.9 (Microsoft)"
 )
 public class UserMapperImpl implements UserMapper {
@@ -31,6 +31,7 @@ public class UserMapperImpl implements UserMapper {
         userEntity.username( user.getUsername() );
         userEntity.profilePicturePath( user.getProfilePicturePath() );
         userEntity.password( user.getPassword() );
+        userEntity.enabled( user.isEnabled() );
         userEntity.mustChangePassword( user.isMustChangePassword() );
         userEntity.accountNonExpired( user.isAccountNonExpired() );
         userEntity.accountNonLocked( user.isAccountNonLocked() );
@@ -53,6 +54,7 @@ public class UserMapperImpl implements UserMapper {
         userDTO.password( entity.getPassword() );
         userDTO.mustChangePassword( entity.isMustChangePassword() );
         userDTO.profilePicturePath( entity.getProfilePicturePath() );
+        userDTO.enabled( entity.isEnabled() );
         userDTO.accountNonExpired( entity.isAccountNonExpired() );
         userDTO.accountNonLocked( entity.isAccountNonLocked() );
         userDTO.credentialNonExpired( entity.isCredentialNonExpired() );
