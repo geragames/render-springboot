@@ -35,6 +35,14 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
 
+    // 🌍 Endpoints públicos (NO JWT)
+    private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/auth/",
+            "/uploads/",
+            "/actuator/",
+            "/swagger-ui",
+            "/v3/api-docs"
+    );
 
     private static final Set<String> ALLOWED_PATHS = Set.of(
             "/auth/change",
@@ -55,6 +63,12 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         logger.error(">>> JWT FILTER EJECUTADO PARA {}", request.getRequestURI());
 
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        String path = request.getRequestURI();
+
+        if(isPublicPath(path)){
+           filterChain.doFilter(request, response);
+        }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -97,6 +111,9 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
     }
 
+    private boolean isPublicPath(String path) {
+        return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+    }
 
     private boolean isAllowPath(HttpServletRequest request) {
 
