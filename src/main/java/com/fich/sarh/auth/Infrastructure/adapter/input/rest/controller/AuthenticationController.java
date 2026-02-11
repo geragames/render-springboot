@@ -1,5 +1,6 @@
 package com.fich.sarh.auth.Infrastructure.adapter.input.rest.controller;
 
+import com.fich.sarh.auth.Application.ports.entrypoint.api.AuthApiPort;
 import com.fich.sarh.auth.Application.ports.output.persistence.UserDetailsSpiPort;
 import com.fich.sarh.auth.Application.ports.output.persistence.UserResetPasswordSpiPort;
 import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.CustomUserDetails;
@@ -28,7 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final UserDetailsSpiPort userDetailsService;
+    private final AuthApiPort authApiPort; // UserDetailsSpiPort userDetailsService;
 
     private final UserResetPasswordSpiPort passwordService;
 
@@ -36,31 +37,33 @@ public class AuthenticationController {
 
 
     @PostMapping(value = "log-in")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest userRequest){
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest userRequest) {
 
-          AuthResponse authResponse =  userDetailsService.loginUser(userRequest);
+        logger.info("LOGIN "+ userRequest);
 
-        logger.info("AUTORIZADO RESPONSE " + authResponse );
+        AuthResponse authResponse = authApiPort.login(userRequest);
+
+        logger.info("AUTORIZADO RESPONSE " + authResponse);
 
 
-        return new ResponseEntity<>( authResponse, HttpStatus.OK);
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
 
     }
 
     @PostMapping("refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody Map<String, String> request){
+    public ResponseEntity<AuthResponse> refresh(@RequestBody Map<String, String> request) {
         logger.info("REFRESH TOKEN " + request.get("refreshToken"));
-        return ResponseEntity.ok(userDetailsService.refreshToken(request.get("refreshToken")));
+        return ResponseEntity.ok(authApiPort.refreshToken(request.get("refreshToken")));
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/change")
-    public ResponseEntity<?> changePassword(Authentication authentication, @RequestBody @Valid UserChangePasswordRequest request){
+    public ResponseEntity<?> changePassword(Authentication authentication, @RequestBody @Valid UserChangePasswordRequest request) {
 
         logger.error("AUTH EN CONTROLLER: {}", authentication);
 
 
-        if( authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails user)){
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails user)) {
             throw new BusinessRuleViolationException("Usuario no autenticado");
         }
 
@@ -70,11 +73,11 @@ public class AuthenticationController {
 
         logger.warn("Actualizacion de contraseña pendiente");
 
-        if(!success) {
+        if (!success) {
             throw new BusinessRuleViolationException("Password actual incorrecta");
         }
 
-        return ResponseEntity.ok( Map.of("message", "Password actualizada correctamente"));
+        return ResponseEntity.ok(Map.of("message", "Password actualizada correctamente"));
 
     }
 

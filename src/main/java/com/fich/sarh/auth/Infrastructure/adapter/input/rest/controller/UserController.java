@@ -16,6 +16,7 @@ import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.mapper.RoleM
 import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.mapper.UserMapper;
 import com.fich.sarh.common.exceptions.BusinessRuleViolationException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,13 +40,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserSaveApiPort userSave;
 
     private final UserUploadSpiPort userUploadSpiPort;
     private final PasswordEncoder passwordEncoder;
-    private final UserResetPasswordSpiPort passwordService;
+  //  private final UserResetPasswordSpiPort passwordService;
 
     private final RoleRetrieveApiPort roleRetrieveApiPort;
 
@@ -57,16 +59,7 @@ public class UserController {
     Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public UserController(UserSaveApiPort userSave, UserUploadSpiPort userUploadSpiPort, PasswordEncoder passwordEncoder, UserResetPasswordSpiPort passwordService, RoleRetrieveApiPort roleRetrieveApiPort, UserRetrieveSpiPort userRetrieveSpiPort, UserUpdateSpiPort userUpdateSpiPort) {
-        this.userSave = userSave;
-        this.userUploadSpiPort = userUploadSpiPort;
-        this.passwordEncoder = passwordEncoder;
-        this.passwordService = passwordService;
 
-        this.roleRetrieveApiPort = roleRetrieveApiPort;
-        this.userRetrieveSpiPort = userRetrieveSpiPort;
-        this.userUpdateSpiPort = userUpdateSpiPort;
-    }
 
     @PreAuthorize("hasAnyRole('ADMIN','DEVELOPER')")
     @GetMapping("{userId}")
@@ -121,7 +114,7 @@ public class UserController {
                 .roles(roles_entity).build();
 
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userSave.saveUsername(UserMapper.INSTANCE.toUserDTO(userEntity)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userSave.saveUsername(userEntity));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DEVELOPER')")
@@ -129,6 +122,7 @@ public class UserController {
     public ResponseEntity<?> updateUser(@PathVariable Long userId, @Validated @RequestPart("updateUser") UserDTO updateUser,
                                         @RequestPart(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
 
+        logger.info("Imagen " + file);
 
         if (file != null && !file.isEmpty()) {
             String filename = storeProfileImage(file);

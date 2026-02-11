@@ -85,10 +85,10 @@ public class UserPersistenceAdapter implements UserRetrieveSpiPort, UserSaveSpiP
     }
 
     @Override
-    public UserDTO saveUsername(UserDTO user) {
+    public UserEntity saveUsername(UserEntity user) {
 
 
-        return UserMapper.INSTANCE.toUserDTO(userRepository.save(UserMapper.INSTANCE.toUserEntity(user)));
+        return userRepository.save(user);
     }
 
 

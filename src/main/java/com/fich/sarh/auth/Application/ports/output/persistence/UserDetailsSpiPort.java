@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserDetailsSpiPort extends UserDetailsService {
 
-    AuthResponse createUser(UserRequest request);
+   // AuthResponse createUser(UserRequest request);
     AuthResponse loginUser(LoginRequest authLoginRequest);
     AuthResponse refreshToken(String refreshToken);
 }

@@ -2,11 +2,11 @@ package com.fich.sarh.auth.Application.services;
 
 import com.fich.sarh.auth.Application.ports.output.persistence.UserUpdateSpiPort;
 import com.fich.sarh.auth.Domain.model.UserDTO;
+import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.SecurityUtils;
 import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.entities.UserEntity;
 import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.mapper.RoleMapper;
 import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.mapper.UserMapper;
 import com.fich.sarh.auth.Infrastructure.adapter.output.persistence.repository.UserRepository;
-import com.fich.sarh.common.SecurityUtils;
 import com.fich.sarh.common.UseCase;
 import com.fich.sarh.common.exceptions.BusinessRuleViolationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +34,21 @@ public class UserUpdateUseCase implements UserUpdateSpiPort {
                 () -> new BusinessRuleViolationException("Usuario no encontrado"));
 
         String loggedUsername = SecurityUtils.getCurrentUsername();
-        if(loggedUsername == null || userEntity.getUsername().equalsIgnoreCase(loggedUsername)){
+       /* if(loggedUsername == null || userEntity.getUsername().equalsIgnoreCase(loggedUsername)){
             throw new BusinessRuleViolationException("No tiene permisos para modificar este usuario  "+ loggedUsername);
-        }
+        }*/
 
+        boolean isSameUser =
+                userEntity.getUsername().equalsIgnoreCase(loggedUsername);
+
+        boolean isAdminOrDeveloper =
+                SecurityUtils.hasAnyRole("ADMIN", "DEVELOPER");
+
+        if (!isSameUser && !isAdminOrDeveloper) {
+            throw new BusinessRuleViolationException(
+                    "No tiene permisos para modificar este usuario"
+            );
+        }
 
         if (dto.getEmail() != null &&
                 !dto.getEmail().equalsIgnoreCase(userEntity.getEmail()) &&

@@ -1,5 +1,6 @@
 package com.fich.sarh.auth.Infrastructure.adapter.configuration.security;
 
+import com.fich.sarh.auth.Infrastructure.adapter.configuration.datasource.DatabaseRoutingFilter;
 import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.filter.JwtTokenValidator;
 import com.fich.sarh.auth.Infrastructure.adapter.configuration.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +43,11 @@ public class SecurityConfig {
 
 
     private final JwtTokenValidator jwtTokenValidator;
+    private final DatabaseRoutingFilter databaseRoutingFilter;
 
-    public SecurityConfig(JwtTokenValidator jwtTokenValidator) {
+    public SecurityConfig(JwtTokenValidator jwtTokenValidator, DatabaseRoutingFilter databaseRoutingFilter) {
         this.jwtTokenValidator = jwtTokenValidator;
+        this.databaseRoutingFilter = databaseRoutingFilter;
     }
 
 
@@ -80,19 +83,21 @@ public class SecurityConfig {
                             ).permitAll()
                             .anyRequest().authenticated();
                 })
+
                 .addFilterBefore(jwtTokenValidator, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(databaseRoutingFilter, JwtTokenValidator.class)
                 //.addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .build();
     }
 
 
-/*
+
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder, AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
+  /*  @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
@@ -100,7 +105,7 @@ public class SecurityConfig {
 
         return provider;
     }
-*/
+  */
 
     @Bean
     PasswordEncoder passwordEncoder() {

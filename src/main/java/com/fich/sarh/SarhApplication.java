@@ -9,6 +9,8 @@ import com.fich.sarh.movement.infrastructure.adapter.output.persistence.reposito
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
@@ -16,15 +18,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-	@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
-@SpringBootApplication
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
+@SpringBootApplication(
+
+)
+
 public class SarhApplication {//implements WebMvcConfigurer {
 
-	private final MovementRepository retrieveServicePort;
+/*	private final MovementRepository retrieveServicePort;
 
 	public SarhApplication(MovementRepository retrieveServicePort) {
 		this.retrieveServicePort = retrieveServicePort;
-	}
+	}*/
 
 
 	public static void main(String[] args) {

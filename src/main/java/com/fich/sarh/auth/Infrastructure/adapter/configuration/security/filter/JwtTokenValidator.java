@@ -66,9 +66,7 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if(isPublicPath(path)){
-           filterChain.doFilter(request, response);
-        }
+
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -94,7 +92,9 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
             // El token de acceso solo debería llegar a rutas que requieren autenticación,
             // pero si la validación JWT es exitosa, se considera auténtico.
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                                     null,
+                                               userDetails.getAuthorities());
 
             // 5. Establecer la autenticación en el SecurityContext
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -108,6 +108,16 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+
+        return path.startsWith("/auth/")
+                || path.startsWith("/uploads/");
 
     }
 

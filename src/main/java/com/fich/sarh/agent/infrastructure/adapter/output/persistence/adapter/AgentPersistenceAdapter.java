@@ -8,6 +8,7 @@ import com.fich.sarh.agent.infrastructure.adapter.output.persistence.entity.Agen
 import com.fich.sarh.agent.infrastructure.adapter.output.persistence.mapper.AgentMapper;
 import com.fich.sarh.agent.infrastructure.adapter.output.persistence.repository.AgentRepository;
 import com.fich.sarh.common.PersistenceAdapter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,15 +22,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @PersistenceAdapter
+@RequiredArgsConstructor
 public class AgentPersistenceAdapter implements AgentLoadPort, AgentSavePort, AgentRetrievePort {
 
     private final AgentRepository agentRepository;
     private final AgentMapper mapper;
 
-    public AgentPersistenceAdapter(AgentRepository agentRepository, AgentMapper mapper) {
-        this.agentRepository = agentRepository;
-        this.mapper = mapper;
-    }
+
 
     //private final AgentMapper agentMapper;
 
